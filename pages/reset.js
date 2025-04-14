@@ -1,5 +1,4 @@
-// pages/reset.js
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { account } from "../lib/appwrite";
 
@@ -13,7 +12,18 @@ export default function ResetPage() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [message, setMessage] = useState("");
 
+  // Debug: Link prüfen
+  useEffect(() => {
+    if (userId && secret) {
+      console.log("🔐 Reset-Link gültig:", { userId, secret });
+    }
+  }, [userId, secret]);
+
   const handleReset = async () => {
+    if (!userId || !secret) {
+      return setMessage("❌ Der Link ist ungültig oder abgelaufen.");
+    }
+
     if (!password || password !== confirm) {
       return setMessage("❌ Passwörter stimmen nicht überein.");
     }
@@ -23,7 +33,10 @@ export default function ResetPage() {
       setMessage("✅ Passwort erfolgreich geändert.");
       setTimeout(() => router.push("/"), 3000);
     } catch (err) {
-      setMessage("❌ Fehler: " + err.message);
+      console.error("❌ Fehler beim Zurücksetzen:", err);
+      setMessage(
+        "❌ Fehler beim Zurücksetzen: " + (err?.message || "Unbekannter Fehler")
+      );
     }
   };
 
@@ -56,7 +69,7 @@ export default function ResetPage() {
           </span>
         </div>
 
-        {/* Bestätigen */}
+        {/* Passwort bestätigen */}
         <div className="relative">
           <input
             type={showConfirm ? "text" : "password"}
@@ -72,7 +85,7 @@ export default function ResetPage() {
           </span>
         </div>
 
-        {/* Button */}
+        {/* Absenden */}
         <button
           onClick={handleReset}
           className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold mt-4 transition duration-200"
@@ -80,6 +93,7 @@ export default function ResetPage() {
           Passwort zurücksetzen
         </button>
 
+        {/* Info */}
         {message && (
           <p className="text-center mt-4 text-sm text-gray-300">{message}</p>
         )}
