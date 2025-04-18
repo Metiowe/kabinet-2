@@ -44,6 +44,43 @@ export default function HomePage() {
         </nav>
       </header>
 
+      {/* 🎞️ Auto-Image-Slider – mobilfreundlich, kleiner & mit Pause */}
+      <div className="w-full max-w-xs sm:max-w-sm mx-auto mt-6 sm:mt-10 overflow-hidden rounded-xl shadow-lg border border-gray-200 bg-white">
+        <motion.div
+          className="flex"
+          animate={{
+            x: [
+              "0%",
+              "0%", // ⏸️ Pause auf Bild 1
+              "-100%",
+              "-100%", // ⏸️ Pause auf Bild 2
+              "-200%",
+              "-200%", // ⏸️ Pause auf Bild 3
+              "-300%",
+              "-300%", // ⏸️ Pause auf Bild 4
+              "-400%",
+              "-400%", // ⏸️ Pause auf Bild 5
+              "0%",
+            ],
+          }}
+          transition={{
+            duration: 30,
+            ease: "linear",
+            repeat: Infinity,
+            times: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
+          }}
+        >
+          {["q1", "q2", "q3", "q4", "q5"].map((img, idx) => (
+            <img
+              key={idx}
+              src={`/images/${img}.png`}
+              alt={`App Screenshot ${idx + 1}`}
+              className="w-full aspect-square object-contain shrink-0"
+            />
+          ))}
+        </motion.div>
+      </div>
+
       {/* 📱 MAIN-CONTENT – Begrüßung + Download */}
       <main className="flex-grow flex flex-col items-center justify-center p-6">
         {/* 🌸 Farsi Begrüßung */}
