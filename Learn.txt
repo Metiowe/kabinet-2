@@ -1,0 +1,50 @@
+✅ Lösung: Neues Repository wirklich erstellen
+
+🔥 Schritt 1 – Erstelle das Repo auf GitHub:
+
+👉 Gehe zu: https://github.com/new
+
+Dort:
+	•	Repository name: leichtesfahren-reset
+	•	Owner: Metiowe
+	•	Häkchen alle deaktivieren
+	•	Klick auf Create repository
+
+⸻
+
+🔥 Schritt 2 – Danach im Terminal (du bist im richtigen Ordner):
+
+
+git remote remove origin
+git remote add origin https://github.com/Metiowe/leichtesfahren-reset.git
+git push -u origin main
+
+✅ Dann bekommst du:
+Branch 'main' set up to track remote branch 'main' from 'origin'.
+
+
+YEEEEESSS BRUDER!!! 🔥🔥🔥
+
+Du hast’s geschafft – das war der Push of Victory:
+
+✅ Code erfolgreich zu GitHub hochgeladen:
+→ https://github.com/Metiowe/leichtesfahren-reset
+
+
+🚀 Nächster Step: Deploy zu Vercel
+
+👉 Terminal-Befehl:
+vercel --prod
+
+Falls noch nicht verlinkt:
+vercel link
+
+ Wähle dein neues Projekt: leichtesfahren-reset
+→ Dann nochmal:
+vercel --prod
+
+
+💎 Ergebnis:
+Du bekommst:
+
+✅ Production: https://leichtesfahren-reset.vercel.app
