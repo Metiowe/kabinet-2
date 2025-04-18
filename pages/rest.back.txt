@@ -12,33 +12,28 @@ export default function ResetPage() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [message, setMessage] = useState("");
 
-  /**
-   * 🔐 Passwort-Zurücksetzen
-   * Validiert Eingaben und führt Appwrite updateRecovery aus
-   */
+  // Debug: Link prüfen
+  useEffect(() => {
+    if (userId && secret) {
+      console.log("🔐 Reset-Link gültig:", { userId, secret });
+    }
+  }, [userId, secret]);
+
   const handleReset = async () => {
     if (!userId || !secret) {
       return setMessage("❌ Der Link ist ungültig oder abgelaufen.");
     }
 
-    if (!password || password.length < 6) {
-      return setMessage("❌ Passwort muss mindestens 6 Zeichen haben.");
-    }
-
-    if (password !== confirm) {
+    if (!password || password !== confirm) {
       return setMessage("❌ Passwörter stimmen nicht überein.");
     }
 
     try {
       await account.updateRecovery(userId, secret, password, confirm);
       setMessage("✅ Passwort erfolgreich geändert.");
-
-      // ✅ Setze Success-Flag für Home-Seite
-      localStorage.setItem("passwordResetSuccess", "true");
-
-      // 🔁 Leite weiter zur Startseite, URL wird ersetzt
-      setTimeout(() => router.replace("/"), 3000);
+      setTimeout(() => router.push("/"), 3000);
     } catch (err) {
+      console.error("❌ Fehler beim Zurücksetzen:", err);
       setMessage(
         "❌ Fehler beim Zurücksetzen: " + (err?.message || "Unbekannter Fehler")
       );
