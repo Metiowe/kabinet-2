@@ -25,6 +25,15 @@ if (
   throw new Error("❌ Fehlende ENV-Variablen – prüfe Vercel Environment!");
 }
 
+console.log("✅ ENV CHECK:", {
+  APPWRITE_ENDPOINT,
+  APPWRITE_PROJECT_ID,
+  DB_ID,
+  OTP_COLLECTION_ID,
+  SMTP_USER,
+  SMTP_PASS: SMTP_PASS ? "OK" : "MISSING",
+});
+
 // ⚙️ Appwrite Setup
 const client = new Client()
   .setEndpoint(APPWRITE_ENDPOINT)
@@ -58,8 +67,8 @@ export default async function handler(
 
   try {
     const doc = await databases.createDocument(
-      DB_ID!,
-      OTP_COLLECTION_ID!,
+      DB_ID,
+      OTP_COLLECTION_ID,
       ID.unique(),
       {
         userId,
@@ -74,8 +83,8 @@ export default async function handler(
       host: "smtp-relay.brevo.com",
       port: 587,
       auth: {
-        user: SMTP_USER!,
-        pass: SMTP_PASS!,
+        user: SMTP_USER,
+        pass: SMTP_PASS,
       },
     });
 
@@ -103,7 +112,7 @@ export default async function handler(
       expiresAt: expiresAt.toISOString(),
     });
   } catch (error: any) {
-    console.error("❌ Fehler:", error.message || error);
+    console.error("❌ Fehler beim OTP-Versand:", error.message || error);
     return res.status(500).json({ error: "❌ Fehler beim OTP-Versand" });
   }
 }
