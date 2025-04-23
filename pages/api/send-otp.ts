@@ -1,11 +1,11 @@
-// src/pages/api/send-otp.ts
+// /pages/api/send-otp.ts in Backend
 
 import type { NextApiRequest, NextApiResponse } from "next";
 import nodemailer from "nodemailer";
 import { Client, Databases, ID } from "node-appwrite";
 
-// Faustregel: Timeout für OTP-Endpoint in ms
-const OTP_EXPIRY_MS = 3 * 60 * 1000; // 3 Minuten
+// OTP Ablauf in ms
+const OTP_EXPIRY_MS = 3 * 60 * 1000;
 
 export default async function handler(
   req: NextApiRequest,
@@ -32,7 +32,7 @@ export default async function handler(
     SMTP_PORT = "587",
     SMTP_USER,
     SMTP_PASS,
-    SMTP_FROM = SMTP_USER,
+    SMTP_FROM = "no-reply@deinedomain.com",
   } = process.env;
 
   if (
@@ -51,7 +51,10 @@ export default async function handler(
   }
 
   // Payload validieren
-  const { userId, email } = req.body as { userId?: unknown; email?: unknown };
+  const { userId, email } = req.body as {
+    userId?: unknown;
+    email?: unknown;
+  };
   if (
     typeof userId !== "string" ||
     !userId.trim() ||
@@ -64,7 +67,7 @@ export default async function handler(
       .json({ error: "❗ userId fehlt oder email ist ungültig" });
   }
 
-  // OTP & Expiry generieren
+  // OTP generieren & Ablauf bestimmen
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
   const expiresAtDate = new Date(Date.now() + OTP_EXPIRY_MS);
   const expiresAt = expiresAtDate.toISOString();
@@ -84,7 +87,7 @@ export default async function handler(
     );
     console.log("✅ OTP in DB gespeichert, ID=", doc.$id);
 
-    // Nodemailer: SMTP-Transporter
+    // Nodemailer: SMTP-Transport
     const transporter = nodemailer.createTransport({
       host: SMTP_HOST,
       port: parseInt(SMTP_PORT, 10),
@@ -94,9 +97,10 @@ export default async function handler(
     await transporter.verify();
     console.log("✅ SMTP ready");
 
-    // Mail versenden und Response loggen
+    // Mail versenden
+    const fromAddress = `"Leichtes Fahren" <${SMTP_FROM}>`;
     const info = await transporter.sendMail({
-      from: SMTP_FROM,
+      from: fromAddress,
       to: email,
       subject: "🔐 Dein Verifizierungscode",
       html: `
