@@ -2,22 +2,17 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import nodemailer from "nodemailer";
 import { Client, Databases, ID } from "node-appwrite";
 
-// 🔐 ENV prüfen + erzwingen
-const getEnv = (key: string): string => {
-  const value = process.env[key];
-  if (!value) throw new Error(`❌ ENV fehlt: ${key}`);
-  return value;
-};
+// 🔐 ENV Variablen prüfen
+const {
+  APPWRITE_ENDPOINT,
+  APPWRITE_PROJECT_ID,
+  APPWRITE_API_KEY,
+  DB_ID,
+  OTP_COLLECTION_ID,
+  SMTP_USER,
+  SMTP_PASS,
+} = process.env;
 
-const APPWRITE_ENDPOINT = getEnv("APPWRITE_ENDPOINT");
-const APPWRITE_PROJECT_ID = getEnv("APPWRITE_PROJECT_ID");
-const APPWRITE_API_KEY = getEnv("APPWRITE_API_KEY");
-const DB_ID = getEnv("DB_ID");
-const OTP_COLLECTION_ID = getEnv("OTP_COLLECTION_ID");
-const SMTP_USER = getEnv("SMTP_USER");
-const SMTP_PASS = getEnv("SMTP_PASS");
-
-// 🔍 Debug-Ausgabe
 console.log("✅ ENV CHECK:", {
   APPWRITE_ENDPOINT,
   APPWRITE_PROJECT_ID,
@@ -26,6 +21,18 @@ console.log("✅ ENV CHECK:", {
   SMTP_USER,
   SMTP_PASS: SMTP_PASS ? "OK" : "MISSING",
 });
+
+if (
+  !APPWRITE_ENDPOINT ||
+  !APPWRITE_PROJECT_ID ||
+  !APPWRITE_API_KEY ||
+  !DB_ID ||
+  !OTP_COLLECTION_ID ||
+  !SMTP_USER ||
+  !SMTP_PASS
+) {
+  throw new Error("❌ Fehlende ENV-Variablen – prüfe Vercel Environment!");
+}
 
 // ⚙️ Appwrite Setup
 const client = new Client()
@@ -53,15 +60,12 @@ export default async function handler(
   }
 
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
-  const expiresAt = new Date(Date.now() + 180 * 1000); // ⏱️ 3 Minuten
-
-  console.log("🔐 OTP generiert:", otp);
-  console.log("⏳ Gültig bis:", expiresAt.toISOString());
+  const expiresAt = new Date(Date.now() + 180 * 1000); // 3 Minuten gültig
 
   try {
     const doc = await databases.createDocument(
-      DB_ID,
-      OTP_COLLECTION_ID,
+      DB_ID!,
+      OTP_COLLECTION_ID!,
       ID.unique(),
       {
         userId,
@@ -70,7 +74,7 @@ export default async function handler(
       }
     );
 
-    console.log("✅ OTP gespeichert:", doc.$id);
+    console.log("✅ OTP in DB gespeichert:", doc.$id);
 
     const transporter = nodemailer.createTransport({
       host: "smtp-relay.brevo.com",
@@ -82,7 +86,7 @@ export default async function handler(
     });
 
     await transporter.verify();
-    console.log("✅ SMTP Verbindung erfolgreich");
+    console.log("✅ SMTP ready");
 
     const info = await transporter.sendMail({
       from: `"Leichtes Fahren" <${SMTP_USER}>`,
@@ -104,8 +108,8 @@ export default async function handler(
       success: true,
       expiresAt: expiresAt.toISOString(),
     });
-  } catch (err: any) {
-    console.error("❌ Fehler beim OTP-Versand:", err.message || err);
+  } catch (error: any) {
+    console.error("❌ Fehler beim OTP-Versand:", error.message || error);
     return res.status(500).json({ error: "❌ Fehler beim OTP-Versand" });
   }
 }
