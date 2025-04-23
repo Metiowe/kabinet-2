@@ -13,13 +13,14 @@ const {
   SMTP_PASS,
 } = process.env;
 
-console.log("✅ ENV CHECK:", {
+// ✅ Wichtig: Logging NACH destructuring
+console.log("📦 ENV LOADED:", {
   APPWRITE_ENDPOINT,
   APPWRITE_PROJECT_ID,
   DB_ID,
   OTP_COLLECTION_ID,
   SMTP_USER,
-  SMTP_PASS: SMTP_PASS ? "OK" : "MISSING",
+  SMTP_PASS: SMTP_PASS ? "✔️" : "❌ MISSING",
 });
 
 if (
@@ -31,7 +32,9 @@ if (
   !SMTP_USER ||
   !SMTP_PASS
 ) {
-  throw new Error("❌ Fehlende ENV-Variablen – prüfe Vercel Environment!");
+  throw new Error(
+    "❌ Fehlende ENV-Variablen – prüfe Vercel Dashboard → Environment Variables."
+  );
 }
 
 // ⚙️ Appwrite Setup
