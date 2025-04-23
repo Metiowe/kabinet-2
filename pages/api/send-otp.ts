@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import nodemailer from "nodemailer";
 import { Client, Databases, ID } from "node-appwrite";
 
-// ✅ Environment prüfen
+// 🔐 ENV Variablen prüfen
 const {
   APPWRITE_ENDPOINT,
   APPWRITE_PROJECT_ID,
@@ -22,14 +22,14 @@ if (
   !SMTP_USER ||
   !SMTP_PASS
 ) {
-  throw new Error("❌ Fehlende ENV-Variablen – .env.local prüfen!");
+  throw new Error("❌ Fehlende ENV-Variablen – prüfe Vercel Environment!");
 }
 
-// ✅ Appwrite Client
+// ⚙️ Appwrite Setup
 const client = new Client()
-  .setEndpoint(APPWRITE_ENDPOINT!)
-  .setProject(APPWRITE_PROJECT_ID!)
-  .setKey(APPWRITE_API_KEY!);
+  .setEndpoint(APPWRITE_ENDPOINT)
+  .setProject(APPWRITE_PROJECT_ID)
+  .setKey(APPWRITE_API_KEY);
 
 const databases = new Databases(client);
 
@@ -37,7 +37,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  console.log("✅ [send-otp] Handler ausgelöst");
+  console.log("📥 Request erhalten:", req.method);
 
   if (req.method !== "POST") {
     return res.status(405).json({ error: "❌ Nur POST erlaubt" });
@@ -46,18 +46,17 @@ export default async function handler(
   const { userId, email } = req.body;
 
   if (!userId || !email) {
-    console.warn("⚠️ Fehlende Daten:", { userId, email });
+    console.warn("⚠️ userId oder email fehlt", { userId, email });
     return res.status(400).json({ error: "❗ userId oder email fehlt" });
   }
 
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
-  const expiresAt = new Date(Date.now() + 30 * 1000); // ⏰ 30 Sekunden Gültigkeit
+  const expiresAt = new Date(Date.now() + 180 * 1000); // 3 Minuten Gültigkeit
 
-  console.log("🔐 Generierter OTP:", otp);
-  console.log("⏳ Gültig bis:", expiresAt.toISOString());
+  console.log("🔐 OTP generiert:", otp);
+  console.log("⏳ Ablaufzeit:", expiresAt.toISOString());
 
   try {
-    // ✅ OTP in Appwrite speichern
     const doc = await databases.createDocument(
       DB_ID!,
       OTP_COLLECTION_ID!,
@@ -68,9 +67,9 @@ export default async function handler(
         expireAt: expiresAt.toISOString(),
       }
     );
-    console.log("✅ OTP gespeichert:", doc.$id);
 
-    // ✅ SMTP vorbereiten
+    console.log("✅ OTP in DB gespeichert:", doc.$id);
+
     const transporter = nodemailer.createTransport({
       host: "smtp-relay.brevo.com",
       port: 587,
@@ -80,13 +79,11 @@ export default async function handler(
       },
     });
 
-    // ✅ Verbindung checken
     await transporter.verify();
-    console.log("✅ SMTP-Verbindung erfolgreich");
+    console.log("✅ SMTP ready");
 
-    // 📤 E-Mail versenden
     const info = await transporter.sendMail({
-      from: `"Leichtes Fahren" <support@leichtesfahren.pro>`,
+      from: `"Leichtes Fahren" <${SMTP_USER}>`,
       to: email,
       subject: "🔐 Dein Verifizierungscode",
       html: `
@@ -94,8 +91,7 @@ export default async function handler(
           <h2>Leichtes Fahren – Verifizierung</h2>
           <p>Gib diesen Code ein:</p>
           <h1 style="font-size: 32px;">${otp}</h1>
-          <p>Der Code ist gültig bis: <strong>${expiresAt.toLocaleTimeString()}</strong></p>
-          <p style="color: #888;">Dieser Code verfällt automatisch.</p>
+          <p>Gültig bis <strong>${expiresAt.toLocaleTimeString()}</strong>.</p>
         </div>
       `,
     });
@@ -106,8 +102,8 @@ export default async function handler(
       success: true,
       expiresAt: expiresAt.toISOString(),
     });
-  } catch (err: any) {
-    console.error("❌ Fehler beim OTP-Versand:", err.message);
+  } catch (error: any) {
+    console.error("❌ Fehler:", error.message || error);
     return res.status(500).json({ error: "❌ Fehler beim OTP-Versand" });
   }
 }
