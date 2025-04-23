@@ -1,4 +1,4 @@
-// src/pages/api/send-otp.ts
+//pages/api/send-otp.ts
 
 import type { NextApiRequest, NextApiResponse } from "next";
 import nodemailer from "nodemailer";
