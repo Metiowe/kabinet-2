@@ -4,6 +4,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import nodemailer from "nodemailer";
 import { Client, Databases, ID } from "node-appwrite";
 
+// ✅ Appwrite Setup
 const client = new Client()
   .setEndpoint(process.env.APPWRITE_ENDPOINT!)
   .setProject(process.env.APPWRITE_PROJECT_ID!)
@@ -15,6 +16,17 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  // 🧪 Debug: Log auf Vercel sichtbar machen
+  console.log("✅ API /send-otp aufgerufen");
+  console.log("➡️ Request Body:", req.body);
+  console.log("🔐 ENV Variablen:", {
+    APPWRITE_ENDPOINT: process.env.APPWRITE_ENDPOINT,
+    APPWRITE_PROJECT_ID: process.env.APPWRITE_PROJECT_ID,
+    DB_ID: process.env.DB_ID,
+    OTP_COLLECTION_ID: process.env.OTP_COLLECTION_ID,
+    SMTP_USER: process.env.SMTP_USER,
+  });
+
   if (req.method !== "POST") {
     return res.status(405).json({ error: "❌ Nur POST erlaubt" });
   }
@@ -29,7 +41,7 @@ export default async function handler(
   const expiresAt = new Date(Date.now() + 30 * 1000);
 
   try {
-    // ➕ OTP in Appwrite speichern
+    // ➕ OTP speichern
     await databases.createDocument(
       process.env.DB_ID!,
       process.env.OTP_COLLECTION_ID!,
@@ -41,7 +53,7 @@ export default async function handler(
       }
     );
 
-    // 📤 SMTP senden (nur serverseitig erlaubt!)
+    // 📤 OTP senden
     const transporter = nodemailer.createTransport({
       host: "smtp-relay.brevo.com",
       port: 587,
@@ -65,6 +77,7 @@ export default async function handler(
       `,
     });
 
+    // ✅ Erfolg zurückgeben
     return res
       .status(200)
       .json({ success: true, expiresAt: expiresAt.toISOString() });
