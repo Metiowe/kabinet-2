@@ -1,8 +1,16 @@
 {
-  "rewrites": [
+  "routes": [
     {
-      "source": "/reset",
-      "destination": "/reset.js"
+      "src": "^/reset$",
+      "dest": "/reset.js"
+    },
+    {
+      "src": "^/api/(.*)$",
+      "dest": "/api/$1",
+      "methods": ["GET", "POST", "OPTIONS"],
+      "headers": {
+        "Access-Control-Allow-Origin": "*"
+      }
     }
   ]
 }
