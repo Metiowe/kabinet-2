@@ -1,3 +1,5 @@
+// pages/api/send-otp.ts
+
 import type { NextApiRequest, NextApiResponse } from "next";
 import nodemailer from "nodemailer";
 import { Client, Databases, ID } from "node-appwrite";
