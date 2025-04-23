@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import nodemailer from "nodemailer";
 import { Client, Databases, ID } from "node-appwrite";
 
-// 🔐 ENV Variablen prüfen
+// 🛠️ ENV Variablen zuerst auslesen
 const {
   APPWRITE_ENDPOINT,
   APPWRITE_PROJECT_ID,
@@ -13,16 +13,7 @@ const {
   SMTP_PASS,
 } = process.env;
 
-// ✅ Wichtig: Logging NACH destructuring
-console.log("📦 ENV LOADED:", {
-  APPWRITE_ENDPOINT,
-  APPWRITE_PROJECT_ID,
-  DB_ID,
-  OTP_COLLECTION_ID,
-  SMTP_USER,
-  SMTP_PASS: SMTP_PASS ? "✔️" : "❌ MISSING",
-});
-
+// Dann prüfen!
 if (
   !APPWRITE_ENDPOINT ||
   !APPWRITE_PROJECT_ID ||
@@ -32,9 +23,7 @@ if (
   !SMTP_USER ||
   !SMTP_PASS
 ) {
-  throw new Error(
-    "❌ Fehlende ENV-Variablen – prüfe Vercel Dashboard → Environment Variables."
-  );
+  throw new Error("❌ Fehlende ENV-Variablen – prüfe Vercel Environment!");
 }
 
 // ⚙️ Appwrite Setup
