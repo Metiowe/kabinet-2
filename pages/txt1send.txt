@@ -1,0 +1,76 @@
+import type { NextApiRequest, NextApiResponse } from "next";
+import { Client, Databases, Query } from "node-appwrite";
+
+type VerifyResponse = { success: true } | { error: string };
+
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<VerifyResponse>
+) {
+  if (req.method !== "POST") {
+    res.setHeader("Allow", ["POST"]);
+    return res.status(405).json({ error: "❌ Nur POST erlaubt" });
+  }
+
+  const {
+    APPWRITE_ENDPOINT,
+    APPWRITE_PROJECT_ID,
+    APPWRITE_API_KEY,
+    DB_ID,
+    OTP_COLLECTION_ID,
+  } = process.env;
+
+  if (
+    !APPWRITE_ENDPOINT ||
+    !APPWRITE_PROJECT_ID ||
+    !APPWRITE_API_KEY ||
+    !DB_ID ||
+    !OTP_COLLECTION_ID
+  ) {
+    return res
+      .status(500)
+      .json({ error: "❌ Interner Serverfehler (ENV fehlt)" });
+  }
+
+  const { userId, otpCode } = req.body as {
+    userId?: unknown;
+    otpCode?: unknown;
+  };
+  if (typeof userId !== "string" || typeof otpCode !== "string") {
+    return res.status(400).json({ error: "❗ userId oder otpCode fehlt" });
+  }
+
+  const client = new Client()
+    .setEndpoint(APPWRITE_ENDPOINT)
+    .setProject(APPWRITE_PROJECT_ID)
+    .setKey(APPWRITE_API_KEY);
+  const databases = new Databases(client);
+
+  try {
+    // Suche den OTP-Datensatz
+    const result = await databases.listDocuments(DB_ID, OTP_COLLECTION_ID, [
+      Query.equal("userId", userId),
+      Query.equal("otp", otpCode),
+    ]);
+
+    if (result.total === 0) {
+      return res.status(404).json({ error: "❌ Code nicht gefunden" });
+    }
+
+    const doc = result.documents[0] as any;
+    const expireAt = new Date(doc.expireAt);
+    const now = new Date();
+
+    if (now > expireAt) {
+      return res.status(410).json({ error: "⌛ Code abgelaufen" });
+    }
+
+    // Optional: OTP löschen oder markieren
+    // await databases.deleteDocument(DB_ID, OTP_COLLECTION_ID, doc.$id);
+
+    return res.status(200).json({ success: true });
+  } catch (err: any) {
+    console.error("❌ Fehler bei OTP-Verifikation:", err);
+    return res.status(500).json({ error: "❌ Interner Serverfehler" });
+  }
+}

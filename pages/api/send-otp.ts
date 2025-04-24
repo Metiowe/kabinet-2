@@ -1,4 +1,4 @@
-// /pages/api/send-otp.ts in Backend
+// src/pages/api/send-otp.ts
 
 import type { NextApiRequest, NextApiResponse } from "next";
 import nodemailer from "nodemailer";
@@ -32,8 +32,10 @@ export default async function handler(
     SMTP_PORT = "587",
     SMTP_USER,
     SMTP_PASS,
-    SMTP_FROM = "no-reply@deinedomain.com",
+    SMTP_FROM = SMTP_USER,
   } = process.env;
+
+  console.log("ℹ️ SMTP_FROM is", SMTP_FROM);
 
   if (
     !APPWRITE_ENDPOINT ||
@@ -42,7 +44,8 @@ export default async function handler(
     !DB_ID ||
     !OTP_COLLECTION_ID ||
     !SMTP_USER ||
-    !SMTP_PASS
+    !SMTP_PASS ||
+    !SMTP_FROM
   ) {
     console.error("❌ Fehlende ENV-Variablen – check Vercel Settings!");
     return res
@@ -51,10 +54,7 @@ export default async function handler(
   }
 
   // Payload validieren
-  const { userId, email } = req.body as {
-    userId?: unknown;
-    email?: unknown;
-  };
+  const { userId, email } = req.body as { userId?: unknown; email?: unknown };
   if (
     typeof userId !== "string" ||
     !userId.trim() ||
