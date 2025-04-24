@@ -65,7 +65,7 @@ export default async function handler(
   try {
     // 🔎 Suche den OTP-Code zum User
     const otpResult = await db.listDocuments(DB_ID, OTP_COLLECTION_ID, [
-      Query.equal("user_id", userId),
+      Query.equal("userId", userId),
       Query.equal("otp", otpCode),
       Query.orderDesc("$createdAt"),
       Query.limit(1),
