@@ -13,16 +13,6 @@ import {
   Truck,
 } from "lucide-react";
 
-// Image-Sets
-const footerImages = [
-  "slider1.jpg",
-  "slider2.jpg",
-  "slider3.jpg",
-  "slider4.jpg",
-  "slider2.jpg",
-  "slider1.jpg",
-];
-
 const sliderImages = [
   "/images/slider1.jpg",
   "/images/slider2.jpg",
@@ -32,14 +22,11 @@ const sliderImages = [
 
 export default function HomePage() {
   const sliderRef = useRef(null);
-  const footerSliderRef = useRef(null);
   const [index, setIndex] = useState(0);
-  const [footerPage, setFooterPage] = useState(0);
 
-  // Main Slider Auto Scroll
   useEffect(() => {
     const interval = setInterval(() => {
-      setIndex((prev) => (prev + 1) % sliderImages.length);
+      setIndex((prevIndex) => (prevIndex + 1) % sliderImages.length);
     }, 4000);
     return () => clearInterval(interval);
   }, []);
@@ -53,33 +40,12 @@ export default function HomePage() {
     }
   }, [index]);
 
-  // Footer Image Slider Auto Scroll
-  useEffect(() => {
-    const totalPages = Math.ceil(footerImages.length / 3);
-    const interval = setInterval(() => {
-      setFooterPage((prev) => (prev + 1) % totalPages);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    if (footerSliderRef.current) {
-      const containerWidth = footerSliderRef.current.clientWidth;
-      footerSliderRef.current.scrollTo({
-        left: footerPage * containerWidth,
-        behavior: "smooth",
-      });
-    }
-  }, [footerPage]);
-
-  // Navigation für Slider
   const goToPrev = () =>
     setIndex((prev) => (prev - 1 + sliderImages.length) % sliderImages.length);
   const goToNext = () => setIndex((prev) => (prev + 1) % sliderImages.length);
 
   return (
     <div className="min-h-screen flex flex-col bg-white text-gray-800 dark:bg-gray-900 dark:text-white">
-      {/* HEADER */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-800 shadow-md py-4 px-6 flex justify-between items-center">
         <h1 className="text-xl font-bold text-green-700 dark:text-green-400">
           SmartClean
@@ -99,7 +65,6 @@ export default function HomePage() {
 
       <div className="h-16" />
 
-      {/* HERO */}
       <section className="text-center py-12 px-4 bg-white dark:bg-gray-900">
         <h1 className="text-4xl font-bold text-green-700 dark:text-green-400 mb-4">
           Der erste autonome Reiniger für echte Profis
@@ -110,7 +75,6 @@ export default function HomePage() {
         </p>
       </section>
 
-      {/* IMAGE SLIDER */}
       <div className="relative w-full h-64 overflow-hidden flex items-center justify-center bg-gray-100 dark:bg-gray-800">
         <button
           onClick={goToPrev}
@@ -150,7 +114,6 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* PRODUCT SECTION */}
       <section className="py-16 px-6 bg-gray-50 dark:bg-gray-800 flex flex-col md:flex-row items-center gap-20">
         <img
           src="/images/slider5.jpg"
@@ -173,7 +136,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* MISSION */}
       <section
         id="mission"
         className="py-16 px-6 text-center bg-white dark:bg-gray-900"
@@ -199,7 +161,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* SERVICES */}
       <section
         id="services"
         className="py-16 px-6 bg-gray-50 dark:bg-gray-800 text-center"
@@ -234,6 +195,7 @@ export default function HomePage() {
               key={i}
               className="relative group w-full md:w-1/2 lg:w-1/4 cursor-pointer p-4 rounded-lg bg-white dark:bg-gray-800 shadow-sm overflow-hidden"
             >
+              {/* Normale Anzeige: Icon + Text nebeneinander */}
               <div className="flex items-start gap-4">
                 <Icon className="w-8 h-8 text-green-700 dark:text-green-400 flex-shrink-0 mt-1" />
                 <div>
@@ -243,6 +205,8 @@ export default function HomePage() {
                   <p>{desc}</p>
                 </div>
               </div>
+
+              {/* Hover Overlay: kompletter Text über dem Icon */}
               <div
                 className="absolute inset-0 bg-green-50 dark:bg-gray-700 bg-opacity-95 flex flex-col justify-center items-center text-center p-4 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                 style={{ pointerEvents: "none" }}
@@ -256,45 +220,25 @@ export default function HomePage() {
           ))}
         </div>
       </section>
-
-      {/* TECH IN ACTION */}
       <section className="py-16 px-6 bg-white dark:bg-gray-900 text-center">
         <h2 className="text-3xl font-bold text-green-800 dark:text-green-300 mb-6">
           Unsere Technologie im Einsatz
         </h2>
-        <div className="relative overflow-hidden">
-          <div
-            ref={footerSliderRef}
-            className="flex transition-all duration-500 ease-in-out w-full overflow-hidden"
-          >
-            {Array.from({ length: Math.ceil(footerImages.length / 3) }).map(
-              (_, pageIndex) => (
-                <div
-                  key={pageIndex}
-                  className="flex-shrink-0 w-full flex justify-center gap-4 px-4"
-                >
-                  {footerImages
-                    .slice(pageIndex * 3, pageIndex * 3 + 3)
-                    .map((img, i) => (
-                      <div
-                        key={i}
-                        className="w-1/3 aspect-[2/1] rounded-2xl shadow-lg overflow-hidden"
-                      >
-                        <img
-                          src={`/images/${img}`}
-                          alt={`Tech ${i + 1}`}
-                          className="w-full h-full object-cover transition-transform duration-500 ease-in-out hover:scale-105"
-                        />
-                      </div>
-                    ))}
-                </div>
-              )
-            )}
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {["slider3.jpg", "slider2.jpg", "slider3.jpg"].map((img, i) => (
+            <div
+              key={i}
+              className="relative w-full aspect-[2/1] overflow-hidden rounded-2xl shadow-lg group"
+            >
+              <img
+                src={`/images/${img}`}
+                alt={`Gerät ${i + 1}`}
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-110"
+              />
+            </div>
+          ))}
         </div>
       </section>
-
-      {/* CONTACT */}
       <section
         id="contact"
         className="py-16 px-6 text-center bg-gray-50 dark:bg-gray-800"
@@ -321,7 +265,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* FOOTER */}
       <footer className="bg-green-700 text-white py-4 px-6 text-center text-sm">
         © {new Date().getFullYear()} SmartClean GmbH. Alle Rechte vorbehalten.
       </footer>
