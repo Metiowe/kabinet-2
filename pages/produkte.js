@@ -117,7 +117,7 @@ export default function ProduktePage() {
       {/* Kauf-Animation */}
       {showSuccess && (
         <div className="fixed top-6 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-4 py-2 rounded-full shadow-lg transition duration-500 z-50">
-          ✔️ "{showSuccess}" wurde dem Warenkorb hinzugefügt
+          ✔️ {`"${showSuccess}"`} wurde dem Warenkorb hinzugefügt
         </div>
       )}
 
