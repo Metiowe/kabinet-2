@@ -1,16 +1,28 @@
+"use client";
+
 import React, { useState } from "react";
 import Link from "next/link";
+import supabase from "@/lib/supabaseClient";
 
 export default function ResetPage() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState(null);
 
-  const handleReset = (e) => {
+  const handleReset = async (e) => {
     e.preventDefault();
-    // Firebase Password Reset Logik kommt später
-    setMessage(
-      "📧 Wenn dein Konto existiert, hast du jetzt eine E-Mail zum Zurücksetzen."
-    );
+    setMessage(null);
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/auth/update-password`,
+    });
+
+    if (error) {
+      setMessage("❌ Fehler: " + error.message);
+    } else {
+      setMessage(
+        "📧 Wenn dein Konto existiert, hast du jetzt eine E-Mail zum Zurücksetzen."
+      );
+    }
   };
 
   return (
@@ -29,7 +41,7 @@ export default function ResetPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white/60 dark:bg-gray-700/60 backdrop-blur text-black dark:text-white"
+            className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white/60 dark:bg-gray-700/60 text-black dark:text-white"
           />
           <button
             type="submit"
