@@ -7,13 +7,12 @@ import {
   CheckCircle,
   ChevronLeft,
   ChevronRight,
-  Building,
-  Home,
-  ShieldCheck,
+  Sofa,
+  LampDesk,
+  Ruler,
   Truck,
 } from "lucide-react";
 
-// Image-Sets
 const footerImages = [
   "slider1.jpg",
   "slider2.jpg",
@@ -30,13 +29,28 @@ const sliderImages = [
   "/images/slider4.jpg",
 ];
 
+const neueProdukte = [
+  {
+    title: "Sideboard Loft",
+    image: "/images/slider2.jpg",
+  },
+  {
+    title: "Schreibtisch Smart",
+    image: "/images/slider3.jpg",
+  },
+  {
+    title: "Küchentisch Urban",
+    image: "/images/slider1.jpg",
+  },
+];
+
 export default function HomePage() {
   const sliderRef = useRef(null);
   const footerSliderRef = useRef(null);
   const [index, setIndex] = useState(0);
   const [footerPage, setFooterPage] = useState(0);
+  const [neuIndex, setNeuIndex] = useState(0);
 
-  // Main Slider Auto Scroll
   useEffect(() => {
     const interval = setInterval(() => {
       setIndex((prev) => (prev + 1) % sliderImages.length);
@@ -53,7 +67,6 @@ export default function HomePage() {
     }
   }, [index]);
 
-  // Footer Image Slider Auto Scroll
   useEffect(() => {
     const totalPages = Math.ceil(footerImages.length / 3);
     const interval = setInterval(() => {
@@ -72,258 +85,93 @@ export default function HomePage() {
     }
   }, [footerPage]);
 
-  // Navigation für Slider
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setNeuIndex((prev) => (prev + 1) % neueProdukte.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
   const goToPrev = () =>
     setIndex((prev) => (prev - 1 + sliderImages.length) % sliderImages.length);
   const goToNext = () => setIndex((prev) => (prev + 1) % sliderImages.length);
 
   return (
     <div className="min-h-screen flex flex-col bg-white text-gray-800 dark:bg-gray-900 dark:text-white">
-      {/* HEADER */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-800 shadow-md py-4 px-6 flex justify-between items-center">
         <h1 className="text-xl font-bold text-green-700 dark:text-green-400">
-          SmartClean
+          MöbelStyle
         </h1>
         <nav className="space-x-4 text-sm font-semibold text-gray-700 dark:text-gray-200">
-          <a href="#mission" className="hover:text-green-700">
-            Mission
+          <a
+            href="#mission"
+            className="hover:text-green-700 dark:hover:text-green-400"
+          >
+            Über uns
           </a>
-          <a href="#services" className="hover:text-green-700">
-            Services
+          <a
+            href="#services"
+            className="hover:text-green-700 dark:hover:text-green-400"
+          >
+            Leistungen
           </a>
-          <a href="#contact" className="hover:text-green-700">
+          <a
+            href="#contact"
+            className="hover:text-green-700 dark:hover:text-green-400"
+          >
             Kontakt
+          </a>
+          <a
+            href="/produkte"
+            className="hover:text-green-700 dark:hover:text-green-400"
+          >
+            Produkte kaufen
           </a>
         </nav>
       </header>
 
       <div className="h-16" />
 
-      {/* HERO */}
-      <section className="text-center py-12 px-4 bg-white dark:bg-gray-900">
-        <h1 className="text-4xl font-bold text-green-700 dark:text-green-400 mb-4">
-          Der erste autonome Reiniger für echte Profis
-        </h1>
-        <p className="text-lg text-gray-700 dark:text-gray-300 max-w-xl mx-auto">
-          SmartClean automatisiert Ihre Reinigung – gründlich, nachhaltig und
-          ohne Aufwand.
-        </p>
-      </section>
-
-      {/* IMAGE SLIDER */}
-      <div className="relative w-full h-64 overflow-hidden flex items-center justify-center bg-gray-100 dark:bg-gray-800">
-        <button
-          onClick={goToPrev}
-          className="absolute left-4 z-10 bg-white dark:bg-gray-700 p-2 rounded-full shadow-md hover:bg-gray-100 dark:hover:bg-gray-600"
-        >
-          <ChevronLeft size={20} />
-        </button>
-        <div
-          ref={sliderRef}
-          className="w-full h-full flex overflow-hidden scroll-smooth"
-        >
-          {sliderImages.map((src, i) => (
-            <img
-              key={i}
-              src={src}
-              alt={`Slide ${i + 1}`}
-              className="w-full h-full object-cover flex-shrink-0"
-            />
-          ))}
-        </div>
-        <button
-          onClick={goToNext}
-          className="absolute right-4 z-10 bg-white dark:bg-gray-700 p-2 rounded-full shadow-md hover:bg-gray-100 dark:hover:bg-gray-600"
-        >
-          <ChevronRight size={20} />
-        </button>
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2 z-10">
-          {sliderImages.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setIndex(i)}
-              className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                i === index ? "bg-green-700" : "bg-gray-300"
-              }`}
-            />
-          ))}
+      <div className="px-6 pt-8 pb-4">
+        <h2 className="text-2xl font-bold text-green-700 dark:text-green-400 mb-2">
+          🆕 Neuigkeiten
+        </h2>
+        <div className="overflow-hidden w-full rounded-lg shadow-md">
+          <div
+            className="flex transition-transform duration-700"
+            style={{ transform: `translateX(-${neuIndex * 100}%)` }}
+          >
+            {neueProdukte.map((item, i) => (
+              <div
+                key={i}
+                className="w-full flex-shrink-0 bg-white dark:bg-gray-800 flex items-center gap-4 p-4"
+              >
+                <img
+                  src={item.image}
+                  alt={item.title}
+                  className="w-28 h-20 object-cover rounded-md shadow"
+                />
+                <span className="text-lg font-semibold text-gray-800 dark:text-white">
+                  {item.title}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* PRODUCT SECTION */}
-      <section className="py-16 px-6 bg-gray-50 dark:bg-gray-800 flex flex-col md:flex-row items-center gap-20">
-        <img
-          src="/images/slider5.jpg"
-          alt="Smart Cleaner"
-          className="w-full md:w-1/2 rounded-xl shadow-lg hover:scale-105 transition duration-300"
-        />
-        <div className="md:w-1/2">
-          <h2 className="text-3xl font-bold text-green-700 dark:text-green-400 mb-4">
-            Unser SmartCleaner 360 ECO
-          </h2>
-          <p className="text-lg text-gray-700 dark:text-gray-300 mb-2">
-            Vollautomatischer, umweltfreundlicher Reiniger für Wohnungen, Büros,
-            Arztpraxen und Gewerbeflächen.
-          </p>
-          <p className="text-gray-600 dark:text-gray-400">
-            Spart Wasser, nutzt biologisch abbaubare Reinigungsmittel und
-            analysiert Raumdaten für optimale Sauberkeit – ohne menschliches
-            Zutun.
-          </p>
-        </div>
-      </section>
-
-      {/* MISSION */}
-      <section
-        id="mission"
-        className="py-16 px-6 text-center bg-white dark:bg-gray-900"
-      >
-        <h2 className="text-3xl font-bold mb-6 text-green-800 dark:text-green-300">
-          Warum SmartClean?
-        </h2>
-        <div className="grid md:grid-cols-3 gap-6">
-          {[
-            ["Gründliche Reinigung", "Makellose Ergebnisse – jedes Mal."],
-            [
-              "Umwelt schützen",
-              "100 % biologisch abbaubare Mittel & Effizienz.",
-            ],
-            ["Echte Effizienz", "Automatisierung spart Zeit und Kosten."],
-          ].map(([title, desc], i) => (
-            <div key={i}>
-              <CheckCircle className="mx-auto text-green-600" size={36} />
-              <h3 className="text-xl font-semibold mt-4">{title}</h3>
-              <p className="text-gray-600 dark:text-gray-400">{desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* SERVICES */}
-      <section
-        id="services"
-        className="py-16 px-6 bg-gray-50 dark:bg-gray-800 text-center"
-      >
-        <h2 className="text-3xl font-bold mb-10 text-green-800 dark:text-green-300">
-          Unsere Services
-        </h2>
-        <div className="max-w-4xl mx-auto flex flex-col md:flex-row md:flex-wrap gap-8 text-left text-lg font-medium text-gray-700 dark:text-gray-300">
-          {[
-            {
-              Icon: Building,
-              title: "Büroreinigung",
-              desc: "täglich, wöchentlich oder nach Bedarf",
-            },
-            {
-              Icon: Home,
-              title: "Wohnungsreinigung",
-              desc: "mit vorherigem Check-up",
-            },
-            {
-              Icon: ShieldCheck,
-              title: "Hygienereinigung",
-              desc: "speziell für Arztpraxen & Pflege",
-            },
-            {
-              Icon: Truck,
-              title: "Anlieferung & Fernwartung",
-              desc: "alles aus einer Hand",
-            },
-          ].map(({ Icon, title, desc }, i) => (
-            <div
-              key={i}
-              className="relative group w-full md:w-1/2 lg:w-1/4 cursor-pointer p-4 rounded-lg bg-white dark:bg-gray-800 shadow-sm overflow-hidden"
-            >
-              <div className="flex items-start gap-4">
-                <Icon className="w-8 h-8 text-green-700 dark:text-green-400 flex-shrink-0 mt-1" />
-                <div>
-                  <h3 className="font-semibold text-green-700 dark:text-green-400 mb-1">
-                    {title}
-                  </h3>
-                  <p>{desc}</p>
-                </div>
-              </div>
-              <div
-                className="absolute inset-0 bg-green-50 dark:bg-gray-700 bg-opacity-95 flex flex-col justify-center items-center text-center p-4 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                style={{ pointerEvents: "none" }}
-              >
-                <h3 className="font-bold text-green-900 dark:text-green-200 mb-2 text-xl">
-                  {title}
-                </h3>
-                <p className="text-green-800 dark:text-green-300">{desc}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* TECH IN ACTION */}
-      <section className="py-16 px-6 bg-white dark:bg-gray-900 text-center">
-        <h2 className="text-3xl font-bold text-green-800 dark:text-green-300 mb-6">
-          Unsere Technologie im Einsatz
-        </h2>
-        <div className="relative overflow-hidden">
-          <div
-            ref={footerSliderRef}
-            className="flex transition-all duration-500 ease-in-out w-full overflow-hidden"
-          >
-            {Array.from({ length: Math.ceil(footerImages.length / 3) }).map(
-              (_, pageIndex) => (
-                <div
-                  key={pageIndex}
-                  className="flex-shrink-0 w-full flex justify-center gap-4 px-4"
-                >
-                  {footerImages
-                    .slice(pageIndex * 3, pageIndex * 3 + 3)
-                    .map((img, i) => (
-                      <div
-                        key={i}
-                        className="w-1/3 aspect-[2/1] rounded-2xl shadow-lg overflow-hidden"
-                      >
-                        <img
-                          src={`/images/${img}`}
-                          alt={`Tech ${i + 1}`}
-                          className="w-full h-full object-cover transition-transform duration-500 ease-in-out hover:scale-105"
-                        />
-                      </div>
-                    ))}
-                </div>
-              )
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* CONTACT */}
-      <section
-        id="contact"
-        className="py-16 px-6 text-center bg-gray-50 dark:bg-gray-800"
-      >
-        <h2 className="text-3xl font-bold mb-4">
-          Jetzt unverbindlich beraten lassen
-        </h2>
-        <p className="text-gray-700 dark:text-gray-300 mb-6">
-          Ganz ohne Registrierung – direkt per Anruf oder E-Mail.
+      <section className="text-center py-12 px-4 bg-white dark:bg-gray-900">
+        <h1 className="text-4xl font-bold text-green-700 dark:text-green-400 mb-4">
+          Moderne Möbel für dein Zuhause
+        </h1>
+        <p className="text-lg text-gray-700 dark:text-gray-300 max-w-xl mx-auto">
+          Entdecke stilvolle Möbelstücke für Wohnzimmer, Küche und Büro.
+          Nachhaltig. Zeitlos. Hochwertig.
         </p>
-        <div className="flex flex-col sm:flex-row justify-center gap-2">
-          <a
-            href="tel:+49123456789"
-            className="bg-green-700 hover:bg-green-800 text-white px-6 py-3 rounded-full font-semibold flex items-center justify-center gap-2 transition"
-          >
-            <Phone size={20} /> Anrufen
-          </a>
-          <a
-            href="mailto:kontakt@smartclean.de"
-            className="bg-white border border-green-700 text-green-700 hover:bg-green-50 px-6 py-3 rounded-full font-semibold flex items-center justify-center gap-2 transition"
-          >
-            <Mail size={20} /> E-Mail senden
-          </a>
-        </div>
       </section>
 
-      {/* FOOTER */}
       <footer className="bg-green-700 text-white py-4 px-6 text-center text-sm">
-        © {new Date().getFullYear()} SmartClean GmbH. Alle Rechte vorbehalten.
+        © {new Date().getFullYear()} MöbelStyle GmbH. Alle Rechte vorbehalten.
       </footer>
     </div>
   );
