@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import { Star, ShoppingCart, Trash2 } from "lucide-react";
 
 const products = [
@@ -45,9 +46,7 @@ export default function ProduktePage() {
   const handleRemoveFromCart = (id) => {
     const updatedCart = cart.filter((item, i) => i !== id);
     setCart(updatedCart);
-    if (updatedCart.length === 0) {
-      setShowCart(false);
-    }
+    if (updatedCart.length === 0) setShowCart(false);
   };
 
   const handleCheckout = () => {
@@ -64,7 +63,6 @@ export default function ProduktePage() {
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-white p-6 pb-20 relative">
-      {/* Warenkorb oben rechts mit Abstand */}
       <div className="fixed top-6 right-6 z-50">
         <div
           onClick={() => setShowCart(!showCart)}
@@ -79,7 +77,6 @@ export default function ProduktePage() {
           </span>
         </div>
 
-        {/* Dropdown Cart */}
         {showCart && cart.length > 0 && (
           <div className="mt-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 w-72">
             <ul className="mb-2 space-y-2">
@@ -114,19 +111,16 @@ export default function ProduktePage() {
         )}
       </div>
 
-      {/* Kauf-Animation */}
       {showSuccess && (
         <div className="fixed top-6 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-4 py-2 rounded-full shadow-lg transition duration-500 z-50">
           ✔️ {`"${showSuccess}"`} wurde dem Warenkorb hinzugefügt
         </div>
       )}
 
-      {/* Titel */}
       <h1 className="text-3xl font-bold mb-4 text-green-700 dark:text-green-400">
         🛋️ Möbel kaufen
       </h1>
 
-      {/* Suchfeld */}
       <input
         type="text"
         placeholder="🔍 Suche nach Produkten..."
@@ -135,7 +129,6 @@ export default function ProduktePage() {
         className="w-full md:w-1/2 mb-6 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
       />
 
-      {/* Produktliste */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredProducts.length > 0 ? (
           filteredProducts.map((product) => (
@@ -143,12 +136,13 @@ export default function ProduktePage() {
               key={product.id}
               className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:scale-105 transition"
             >
-              <img
+              <Image
                 src={product.image || "/images/default.jpg"}
                 alt={product.title}
+                width={400}
+                height={240}
                 className="w-full h-60 object-cover"
               />
-
               <div className="p-4 flex flex-col justify-between h-full">
                 <div>
                   <div className="flex justify-between items-center mb-1">
@@ -159,15 +153,12 @@ export default function ProduktePage() {
                       🛒 {product.price.toFixed(2)} €
                     </span>
                   </div>
-
                   <h2 className="text-lg font-bold text-gray-900 dark:text-white mt-2">
                     {product.title}
                   </h2>
-
                   <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                     {product.description}
                   </p>
-
                   <div className="flex items-center mt-2 gap-1">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <Star
