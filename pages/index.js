@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import {
   Phone,
   Mail,
@@ -116,27 +117,24 @@ export default function HomePage() {
           >
             Kontakt
           </a>
-          <a
-            href="/produkte"
-            className="hover:text-green-700 dark:hover:text-green-400"
-          >
-            Produkte kaufen
-          </a>
+          <Link href="/produkte" legacyBehavior>
+            <a className="hover:text-green-700 dark:hover:text-green-400">
+              Produkte kaufen
+            </a>
+          </Link>
 
           {!user ? (
             <>
-              <a
-                href="/auth/signin"
-                className="hover:text-green-700 dark:hover:text-green-400"
-              >
-                Anmelden
-              </a>
-              <a
-                href="/auth/signup"
-                className="hover:text-green-700 dark:hover:text-green-400"
-              >
-                Registrieren
-              </a>
+              <Link href="/auth/signin" legacyBehavior>
+                <a className="hover:text-green-700 dark:hover:text-green-400">
+                  Anmelden
+                </a>
+              </Link>
+              <Link href="/auth/signup" legacyBehavior>
+                <a className="hover:text-green-700 dark:hover:text-green-400">
+                  Registrieren
+                </a>
+              </Link>
             </>
           ) : (
             <div className="flex items-center gap-2">
